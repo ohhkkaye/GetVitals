@@ -15,19 +15,16 @@ public class VitalTest {
 		String answer;
 		String patientAnswer;
 		PatientInfo patient1 = new PatientInfo();
-		Hospital patient11 = new Hospital();
 
 		System.out.println("We're going to retrieve vitals for the next patient");
 		System.out.println("Would you like to add a patient? Please respond 'yes' or 'no'.");
 			Scanner c = new Scanner(System.in);
 			answer=c.nextLine();
 		
-
 		while (answer.equals("yes")){
 			patient1.getName();
 			patient1.getDOB();
 			patient1.readVitals();
-			// patient1.addVitalInfo();
 			
 			System.out.println("Would you like to add another patient?" );
 			Scanner b = new Scanner(System.in);
@@ -41,7 +38,6 @@ public class VitalTest {
 		while (patientAnswer.equals("yes")) {
 			if (patientAnswer.equals("yes")){
 				patient1.pullUpPatient();
-				patient11.diagnosis();
 			} else {
 				System.out.println("You are exiting the system.");
 			}
@@ -59,25 +55,9 @@ class PatientInfo extends Vitals {
 	String name;
 	ArrayList<String> nameDatabase = new ArrayList<String>();
 	Map<String, String> database = new HashMap<String, String>();
-	Map<String, Integer> databaseVitals = new HashMap<String, Integer>();
 	String check_name;
 	String dob;
-	
-	public void readVitals() {
-		Vitals patient1vitals = new Vitals();
-
-		patient1vitals.bpmReading();
-		patient1vitals.bodyTempReading();
-		patient1vitals.respirationReading();
-		patient1vitals.bpReading();
-		
-		System.out.println(publicBodyTemp);
-		databaseVitals.put(name, publicBodyTemp);
-	}
-
-	// public void addVitalInfo() {
-	// 	S
-	// }
+	Vitals patient1vitals = new Vitals();
 
 	public void getName() {
 		System.out.println("What is the patient's name: ");
@@ -110,39 +90,29 @@ class PatientInfo extends Vitals {
 			System.out.println(check_name + " is currently in the system. ");
 			}	
 		String dateOfBirth = database.get(name);
-		int readBPM = databaseVitals.get(name);
 		System.out.println("This patient has a date of birth of " + dateOfBirth);
-		System.out.println("The BPM is currently: " + readBPM);
+		patient1vitals.showVitals();
+		patient1vitals.diagnosis();
+		
 	}
 
 	public void retrieveDatabase() {
 		System.out.println("These are the patients added today: ");
 		System.out.println(nameDatabase);		
 	}
-}
 
+	public void readVitals() {
 
-class Hospital extends Vitals {
-
-	public void diagnosis(){
-		if ((publicBodyTemp < 100) && (publicBodyTemp > 97)) {
-			System.out.println("Body temperature is normal.");
-		} else if(publicBodyTemp > 100) {
-			System.out.println("Body temperature is too high. This patient has a fever");
-		} else {
-			System.out.println("Body temperature is too low.");
-		}
-
-		if ((publicBPM < 100) && (publicBPM > 60)) {
-			System.out.println("Resting heart rate is normal.");
-		} else if(publicBPM > 100) {
-			System.out.println("Patient heart rate is very high.");
-		} else {
-			System.out.println("Patient heart rate is very low.");
-		}
-
+		patient1vitals.bpmReading();
+		patient1vitals.bodyTempReading();
+		patient1vitals.respirationReading();
+		patient1vitals.bpReading();
+		patient1vitals.retrievePrivateVitals();
+		patient1vitals.saveVitals();
 	}
+
 }
+
 
 class Vitals {
 
@@ -154,7 +124,12 @@ class Vitals {
 	public int publicBPM;
 	public int publicBloodPressure;
 	public int publicRespiration;
+	int readBPM;
+	int readBodyTemp;
+	int readBP;
+	int readResp;
 
+	Map<String, Integer> databaseVitals = new HashMap<String, Integer>();
 
 	void bpmReading(){
 		bpm = (int) (Math.random() * (121-39)) + 39; 
@@ -175,10 +150,47 @@ class Vitals {
 		System.out.println("The blood pressure is currently " + bloodPressure + "mm Hg."); //mm HG 
 	}
 
-	public void retrieveVitals(){
+	public void retrievePrivateVitals(){
 		publicBodyTemp=bodyTemp;
 		publicBPM=bpm;
 		publicBloodPressure=bloodPressure;
 		publicRespiration=respiration;
+	}
+
+	public void saveVitals() { 
+		databaseVitals.put("Body Temperature", publicBodyTemp);
+		databaseVitals.put("Respiration", publicRespiration);
+		databaseVitals.put("BPM", publicBPM);
+		databaseVitals.put("Blood Pressure", publicBloodPressure);
+	}
+
+	public void showVitals() {
+		readBPM = databaseVitals.get("BPM");
+		readBodyTemp = databaseVitals.get("Body Temperature");
+		readResp = databaseVitals.get("Respiration");
+		readBP = databaseVitals.get("Blood Pressure");
+		System.out.println("The BPM is currently: " + readBPM);
+		System.out.println("The body temperature is currently: " + readBodyTemp);
+		System.out.println("The respiration is currently: " + readResp);
+		System.out.println("The blood pressure is currently: " + readBP);
+
+	}
+
+	public void diagnosis(){
+		if (publicBodyTemp > 100) {
+			System.out.println("Body temperature is too high.This patient has a fever.");
+		} else if(publicBodyTemp < 96) {
+			System.out.println("Body temperature is too low.");
+		} else {
+			System.out.println("Body temperature normal.");
+		}
+
+		if (publicBPM < 60) {
+			System.out.println("Resting heart rate is very low.");
+		} else if(publicBPM > 99) {
+			System.out.println("Patient heart rate is very high.");
+		} else {
+			System.out.println("Patient heart rate is normal.");
+		}
 	}
 }
